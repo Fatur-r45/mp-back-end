@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model jawaban_peserta {
+  id              Int         @id @default(autoincrement())
+  id_user         Int?
+  id_quiz         Int?
+  id_pertanyaan   Int?
+  jawaban_peserta Int
+  skor            Int?
+  pertanyaan      pertanyaan? @relation(fields: [id_pertanyaan], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quiz            quiz?       @relation(fields: [id_quiz], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user            user?       @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model pertanyaan {
+  id              Int               @id @default(autoincrement())
+  pertanyaan      String
+  opsi_jawaban    String
+  jawaban_benar   Int
+  id_quiz         Int?
+  jawaban_peserta jawaban_peserta[]
+  quiz            quiz?             @relation(fields: [id_quiz], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model quiz {
+  id              Int               @id @default(autoincrement())
+  judul           String            @db.VarChar(255)
+  deskripsi       String?
+  waktu_mulai     DateTime          @db.Timestamp(6)
+  waktu_selesai   DateTime          @db.Timestamp(6)
+  jawaban_peserta jawaban_peserta[]
+  pertanyaan      pertanyaan[]
+  hasil_jawaban hasil_jawaban[]
+}
+
+model user {
+  id              Int               @id @default(autoincrement())
+  nama            String            @db.VarChar(255)
+  email           String            @unique @db.VarChar(255)
+  password        String            @db.VarChar(255)
+  role            String            @db.VarChar(50)
+  jawaban_peserta jawaban_peserta[]
+  hasil_jawaban hasil_jawaban[]
+}
+
+model hasil_jawaban{
+  id Int @id @default(autoincrement())
+  id_user Int?
+  id_quiz Int?
+  hasil Int
+  quiz            quiz?       @relation(fields: [id_quiz], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user            user?       @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
